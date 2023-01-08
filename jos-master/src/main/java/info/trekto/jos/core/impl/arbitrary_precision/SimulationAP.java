@@ -49,6 +49,9 @@ public class SimulationAP implements Simulation {
     public static Semaphore ThreadStartSemaphore = new Semaphore(0);
     public static Semaphore ThreadEndSemaphore = new Semaphore(0);
     public static Semaphore CheckCollisionSemaphore = new Semaphore(0);
+    public static Semaphore StatisticsSemaphore = new Semaphore(1);
+
+    public static int M = 100; // Cada M veces se hace un print de las estadísticas
 
     public static SimulationLogicAP.ThreadCalculator[] Threads = new SimulationLogicAP.ThreadCalculator[SimulationProperties.getNumberOfThreads()];
 
@@ -121,6 +124,15 @@ public class SimulationAP implements Simulation {
         if (properties.isSaveToFile() && saveCurrentIterationToFile) {
             C.getReaderWriter().appendObjectsToFile(objects, properties, iterationCounter);
         }
+
+    }
+
+    private void printTotalStats(int iterationCounter, int evaluatedObjects, int fusionedObjects){
+        System.out.println("========================================");
+        System.out.println("Iteration: " + iterationCounter);
+        System.out.println("Evaluated objects: " + evaluatedObjects);
+        System.out.println("Fusioned objects: " + fusionedObjects);
+        System.out.println("========================================");
     }
 
     public void playSimulation(String inputFile) {

@@ -3,7 +3,6 @@ package info.trekto.jos.core.impl.arbitrary_precision;
 import info.trekto.jos.core.Simulation;
 import info.trekto.jos.core.SimulationLogic;
 import info.trekto.jos.core.impl.SimulationProperties;
-import info.trekto.jos.core.impl.single_precision.SimulationLogicFloat;
 import info.trekto.jos.core.model.ImmutableSimulationObject;
 import info.trekto.jos.core.model.SimulationObject;
 import info.trekto.jos.core.model.impl.TripleNumber;
@@ -23,8 +22,8 @@ import static info.trekto.jos.core.numbers.NumberFactoryProxy.*;
  */
 
 /* ---------------------------------------------------------------
-Práctica 1.
-Código fuente : nbfast.c
+Práctica 4.
+Código fuente : NbodyJOS.java
 Grau Informàtica
 Y2386362B - Alexandru Cristian Stoia
 48054396J - Pol Triquell Lombardo
@@ -44,7 +43,7 @@ public class SimulationLogicAP implements SimulationLogic {
         public void run(){
 
             for(int iteration = 1; iteration <= SimulationProperties.getNumberOfIterations(); iteration++){
-
+                long startTime = System.currentTimeMillis();
                 try {
                     SimulationAP.ThreadStartSemaphore.acquire(); // Espera a que el hilo principal le de permiso para empezar
                 } catch (InterruptedException e) {
@@ -70,9 +69,54 @@ public class SimulationLogicAP implements SimulationLogic {
                 //System.out.println(("Iteration: " + iteration));
 
                 calculateNewValues(start, end);
+
+                long endTime = System.currentTimeMillis();
+                if(iteration % SimulationAP.M == 0){
+                    try {
+                        SimulationAP.StatisticsSemaphore.acquire(); // No permite intercalar prints de los threads
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    long elapsedTime = endTime - startTime;
+                    int evaluatedParticles = (end-start);
+                    System.out.println("========================================");
+                    System.out.println("   ---Thread " + id + " iteration " + iteration+  " ---   ");
+                    System.out.println("time: " + elapsedTime + " ms");
+                    System.out.println("evaluated particles: " + evaluatedParticles);
+                    System.out.println("fusioned particles: " + checkCollisions(start,end));
+                    System.out.println("========================================");
+                    SimulationAP.StatisticsSemaphore.release(); // Libera el semaforo para que otro thread pueda imprimir
+                }
             }
         }
     }
+    public static int checkCollisions(int fromIndex, int toIndex)
+    {
+        int collisions = 0;
+        if (simulation.isCollisionExists()) {
+            collisions+=1;
+        }
+
+        for (SimulationObject object : simulation.getAuxiliaryObjects().subList(fromIndex, toIndex)) {
+            if (simulation.isCollisionExists()) {
+                break;
+            }
+            for (SimulationObject object1 : simulation.getAuxiliaryObjects()) {
+                if (object == object1) {
+                    continue;
+                }
+                // distance between centres
+                Number distance = simulation.calculateDistance(object, object1);
+
+                if (distance.compareTo(object.getRadius().add(object1.getRadius())) <= 0) {
+                    simulation.upCollisionExists();
+                    break;
+                }
+            }
+        }
+        return collisions;
+    }
+
     public static void calculateNewValues(int fromIndex, int toIndex) {
 
         Iterator<SimulationObject> newObjectsIterator = simulation.getAuxiliaryObjects().subList(fromIndex, toIndex).iterator();
