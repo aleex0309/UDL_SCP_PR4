@@ -30,6 +30,8 @@ Y2386362B - Alexandru Cristian Stoia
 --------------------------------------------------------------- */
 public class SimulationLogicAP implements SimulationLogic {
     public static Simulation simulation;
+    public static final Object CollisionLock = new Object(); // Synchronized object
+    private static int threadsEnded = 0;
 
     public SimulationLogicAP(Simulation simulation) {
         this.simulation = simulation;
@@ -70,6 +72,14 @@ public class SimulationLogicAP implements SimulationLogic {
 
                 calculateNewValues(start, end);
 
+                synchronized (CollisionLock) {
+                    threadsEnded++;
+                    if (threadsEnded == SimulationProperties.getNumberOfThreads()) {
+                        threadsEnded = 0;
+                        CollisionLock.notifyAll();
+                    }
+                }
+
                 long endTime = System.currentTimeMillis();
                 if(iteration % SimulationAP.M == 0){
                     try {
@@ -80,10 +90,10 @@ public class SimulationLogicAP implements SimulationLogic {
                     long elapsedTime = endTime - startTime;
                     int evaluatedParticles = (end-start);
                     System.out.println("========================================");
-                    System.out.println("   ---Thread " + id + " iteration " + iteration+  " ---   ");
-                    System.out.println("time: " + elapsedTime + " ms");
-                    System.out.println("evaluated particles: " + evaluatedParticles);
-                    System.out.println("fusioned particles: " + checkCollisions(start,end));
+                    System.out.println("   --- Thread " + id + " iteration " + iteration+  " ---   ");
+                    System.out.println("Time: " + elapsedTime + " ms");
+                    System.out.println("Evaluated particles: " + evaluatedParticles);
+                    System.out.println("Fusioned particles: " + checkCollisions(start,end));
                     System.out.println("========================================");
                     SimulationAP.StatisticsSemaphore.release(); // Libera el semaforo para que otro thread pueda imprimir
                 }
@@ -169,7 +179,6 @@ public class SimulationLogicAP implements SimulationLogic {
         }
 
         SimulationAP.ThreadEndSemaphore.release();// El hilo principal espera a que todos los hilos terminen para continuar
-        SimulationAP.CheckCollisionSemaphore.release();//Check collisions cuando todos han acabado
     }
 
     public void calculateAllNewValues() {

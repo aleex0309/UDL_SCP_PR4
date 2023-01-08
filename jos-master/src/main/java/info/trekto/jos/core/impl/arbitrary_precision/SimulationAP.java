@@ -23,6 +23,7 @@ import java.util.concurrent.Semaphore;
 
 import static info.trekto.jos.core.Controller.C;
 // import static info.trekto.jos.core.impl.arbitrary_precision.SimulationRecursiveAction.threshold;
+import static info.trekto.jos.core.impl.arbitrary_precision.SimulationLogicAP.CollisionLock;
 import static info.trekto.jos.util.Utils.*;
 
 /**
@@ -46,12 +47,12 @@ public class SimulationAP implements Simulation {
     
     private volatile boolean collisionExists;
 
+    //Semaphores
     public static Semaphore ThreadStartSemaphore = new Semaphore(0);
     public static Semaphore ThreadEndSemaphore = new Semaphore(0);
-    public static Semaphore CheckCollisionSemaphore = new Semaphore(0);
     public static Semaphore StatisticsSemaphore = new Semaphore(1);
 
-    public static int M = 100; // Cada M veces se hace un print de las estadísticas
+    public static int M = 25; // Cada M veces se hace un print de las estadísticas
 
     public static SimulationLogicAP.ThreadCalculator[] Threads = new SimulationLogicAP.ThreadCalculator[SimulationProperties.getNumberOfThreads()];
 
@@ -103,7 +104,10 @@ public class SimulationAP implements Simulation {
         ThreadStartSemaphore.release(SimulationProperties.getNumberOfThreads());
         simulationLogic.calculateAllNewValues();
 
-        CheckCollisionSemaphore.acquire(SimulationProperties.getNumberOfThreads());
+        //Synchronised
+        synchronized (CollisionLock){
+            CollisionLock.wait();
+        }
         /* Collision */
         CollisionCheckAP collisionCheck = new CollisionCheckAP(0, auxiliaryObjects.size(), this);
         collisionExists = false;
