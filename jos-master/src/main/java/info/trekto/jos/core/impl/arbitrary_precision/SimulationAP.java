@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static info.trekto.jos.core.Controller.C;
 // import static info.trekto.jos.core.impl.arbitrary_precision.SimulationRecursiveAction.threshold;
@@ -47,6 +49,11 @@ public class SimulationAP implements Simulation {
     
     private volatile boolean collisionExists;
 
+    //Global variables for the total progress of the simulation
+    public static long totalTime = 0;
+    public static int totalEvaluated = 0;
+    public static int totalFusioned = 0;
+
     //Semaphores
     public static Semaphore ThreadStartSemaphore = new Semaphore(0);
     public static Semaphore ThreadEndSemaphore = new Semaphore(0);
@@ -56,6 +63,8 @@ public class SimulationAP implements Simulation {
     public static int M = 25; // Cada M veces se hace un print de las estadísticas
 
     public static SimulationLogicAP.ThreadCalculator[] Threads = new SimulationLogicAP.ThreadCalculator[SimulationProperties.getNumberOfThreads()];
+
+    public static Lock editTotalsLock = new ReentrantLock();// Lock para editar los totales de las estadísticas desde los threads
 
     public SimulationAP(SimulationProperties properties) {
         simulationLogic = new SimulationLogicAP(this);
@@ -132,11 +141,11 @@ public class SimulationAP implements Simulation {
 
     }
 
-    private void printTotalStats(int iterationCounter, int evaluatedObjects, int fusionedObjects){
+    private void printTotalStats(){
         System.out.println("========================================");
-        System.out.println("Iteration: " + iterationCounter);
-        System.out.println("Evaluated objects: " + evaluatedObjects);
-        System.out.println("Fusioned objects: " + fusionedObjects);
+        System.out.println("Total threads time: " + totalTime);
+        System.out.println("Total Fusioned objects: " + totalFusioned);
+        System.out.println("Total Evaluated objects: " + totalEvaluated);
         System.out.println("========================================");
     }
 
@@ -261,6 +270,7 @@ public class SimulationAP implements Simulation {
                     error(logger, "Concurrency failure. One of the threads interrupted in cycle " + i, e);
                 }
             }
+            printTotalStats(); //When the simulation ends, print the total stats
 
             if (properties.isRealTimeVisualization()) {
                 C.getVisualizer().end();

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1805eb4-ef17-4030-959b-f0e779e2db8c" name="Changes" comment="Synchronized implemented">
+    <list default="true" id="c1805eb4-ef17-4030-959b-f0e779e2db8c" name="Changes" comment="Stats print partial and total from threads">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationAP.java" beforeDir="false" afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationAP.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationLogicAP.java" beforeDir="false" afterPath="$PROJECT_DIR$/jos-master/src/main/java/info/trekto/jos/core/impl/arbitrary_precision/SimulationLogicAP.java" afterDir="false" />
@@ -92,7 +92,7 @@
       <workItem from="1668437492182" duration="5706000" />
       <workItem from="1673088089834" duration="17342000" />
       <workItem from="1673173033832" duration="34000" />
-      <workItem from="1673173086447" duration="11272000" />
+      <workItem from="1673173086447" duration="12351000" />
     </task>
     <task id="LOCAL-00001" summary="Java-SimulationLogicDouble Working with threads">
       <created>1668338913769</created>
@@ -150,7 +150,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673194441853</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Stats print partial and total from threads">
+      <created>1673196130382</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1673196130382</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,7 +185,8 @@
     <MESSAGE value="Works determinist" />
     <MESSAGE value="Threads print their stats correctly, in order" />
     <MESSAGE value="Synchronized implemented" />
-    <option name="LAST_COMMIT_MESSAGE" value="Synchronized implemented" />
+    <MESSAGE value="Stats print partial and total from threads" />
+    <option name="LAST_COMMIT_MESSAGE" value="Stats print partial and total from threads" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

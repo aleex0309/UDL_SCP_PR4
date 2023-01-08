@@ -11,7 +11,6 @@ import info.trekto.jos.core.numbers.Number;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 
 import static info.trekto.jos.core.Controller.C;
 import static info.trekto.jos.core.numbers.NumberFactoryProxy.*;
@@ -91,6 +90,10 @@ public class SimulationLogicAP implements SimulationLogic {
                 int fusioned = checkCollisions(start,end);
                 totalCollisions += fusioned;
 
+                SimulationAP.editTotalsLock.lock();
+                addInfotoTotals(elapsedTime, evaluatedParticles, fusioned);
+                SimulationAP.editTotalsLock.unlock();
+
                 if(iteration % SimulationAP.M == 0 ){
                     try {
                         SimulationAP.StatisticsSemaphore.acquire(); // No permite intercalar prints de los threads
@@ -121,6 +124,12 @@ public class SimulationLogicAP implements SimulationLogic {
                     SimulationAP.TotalStatisticsSemaphore.release();
                 }
             }
+        }
+
+        private void addInfotoTotals(long elapsedTime, int evaluatedParticles, int fusioned) {
+            SimulationAP.totalTime += elapsedTime;
+            SimulationAP.totalEvaluated += evaluatedParticles;
+            SimulationAP.totalFusioned += fusioned;
         }
     }
     public static int checkCollisions(int fromIndex, int toIndex)
