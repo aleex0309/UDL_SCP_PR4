@@ -51,6 +51,7 @@ public class SimulationAP implements Simulation {
     public static Semaphore ThreadStartSemaphore = new Semaphore(0);
     public static Semaphore ThreadEndSemaphore = new Semaphore(0);
     public static Semaphore StatisticsSemaphore = new Semaphore(1);
+    public static Semaphore TotalStatisticsSemaphore = new Semaphore(1);
 
     public static int M = 25; // Cada M veces se hace un print de las estadísticas
 

@@ -43,6 +43,9 @@ public class SimulationLogicAP implements SimulationLogic {
         }
         @Override
         public void run(){
+            long totalTime = 0;
+            int totalEvaluated = 0;
+            int totalCollisions = 0;
 
             for(int iteration = 1; iteration <= SimulationProperties.getNumberOfIterations(); iteration++){
                 long startTime = System.currentTimeMillis();
@@ -79,23 +82,43 @@ public class SimulationLogicAP implements SimulationLogic {
                         CollisionLock.notifyAll();
                     }
                 }
-
                 long endTime = System.currentTimeMillis();
-                if(iteration % SimulationAP.M == 0){
+
+                long elapsedTime = endTime - startTime;
+                totalTime += elapsedTime;
+                int evaluatedParticles = (end-start);
+                totalEvaluated += evaluatedParticles;
+                int fusioned = checkCollisions(start,end);
+                totalCollisions += fusioned;
+
+                if(iteration % SimulationAP.M == 0 ){
                     try {
                         SimulationAP.StatisticsSemaphore.acquire(); // No permite intercalar prints de los threads
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    long elapsedTime = endTime - startTime;
-                    int evaluatedParticles = (end-start);
                     System.out.println("========================================");
                     System.out.println("   --- Thread " + id + " iteration " + iteration+  " ---   ");
-                    System.out.println("Time: " + elapsedTime + " ms");
-                    System.out.println("Evaluated particles: " + evaluatedParticles);
-                    System.out.println("Fusioned particles: " + checkCollisions(start,end));
+                    System.out.println("Time: " + totalTime + " ms");
+                    System.out.println("Evaluated particles: " + totalEvaluated);
+                    System.out.println("Fusioned particles: " + totalCollisions);
                     System.out.println("========================================");
                     SimulationAP.StatisticsSemaphore.release(); // Libera el semaforo para que otro thread pueda imprimir
+                }
+                //Si es la ultima iteracion, printamos las estadisticas totales de cada thread
+                if(iteration == SimulationProperties.getNumberOfIterations()){
+                    try {
+                        SimulationAP.TotalStatisticsSemaphore.acquire(); // No permite intercalar prints de los threads
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println("========================================");
+                    System.out.println("   --- Thread " + id + " TOTAL STATISTICS ---   ");
+                    System.out.println("Total time: " + totalTime + " ms");
+                    System.out.println("Total evaluated particles: " + totalEvaluated);
+                    System.out.println("Total fusioned particles: " + totalCollisions);
+                    System.out.println("========================================");
+                    SimulationAP.TotalStatisticsSemaphore.release();
                 }
             }
         }
