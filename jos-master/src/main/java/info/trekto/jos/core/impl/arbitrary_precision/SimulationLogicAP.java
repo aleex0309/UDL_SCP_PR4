@@ -90,11 +90,11 @@ public class SimulationLogicAP implements SimulationLogic {
                 int fusioned = checkCollisions(start,end);
                 totalCollisions += fusioned;
 
-                SimulationAP.editTotalsLock.lock();
-                addInfotoTotals(elapsedTime, evaluatedParticles, fusioned);
-                SimulationAP.editTotalsLock.unlock();
-
                 if(iteration % SimulationAP.M == 0 ){
+
+                    SimulationAP.editTotalsLock.lock();
+                    addInfotoTotals(elapsedTime, evaluatedParticles, totalCollisions);
+                    SimulationAP.editTotalsLock.unlock();
                     try {
                         SimulationAP.StatisticsSemaphore.acquire(); // No permite intercalar prints de los threads
                     } catch (InterruptedException e) {

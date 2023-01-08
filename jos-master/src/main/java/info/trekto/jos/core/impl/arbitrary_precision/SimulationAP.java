@@ -142,11 +142,11 @@ public class SimulationAP implements Simulation {
     }
 
     private void printTotalStats(){
-        System.out.println("========================================");
+        System.out.println("===============TOTAL STATISTICS=========================");
         System.out.println("Total threads time: " + totalTime);
         System.out.println("Total Fusioned objects: " + totalFusioned);
         System.out.println("Total Evaluated objects: " + totalEvaluated);
-        System.out.println("========================================");
+        System.out.println("=========================================================");
     }
 
     public void playSimulation(String inputFile) {
